@@ -5,13 +5,17 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Main extends Application {
@@ -20,21 +24,44 @@ public class Main extends Application {
 
     private Pane root = new Pane();
 
-    private Player player = new Player("Roma");
-
     private final int WIDTH = 1300;
     private final int HEIGHT = 700;
 
-    private AnimationTimer timerBullet;
+    private int xStartPositionPlayer = WIDTH / 2;
+    private int yStartPositionPlayer = HEIGHT - 50;
+
+    private int speedOfPlayer = 5;
+    private int speedOfBullet = 2;
+
+    private int leftBorderOfPlayer = 1300;
+    private int rightBorderOfPlayer = 0;
+
+    private int leftBorderOfBullet = 0;
+    private int rightBorderOfBullet = 1300;
+
+    private int frequencyOfBullets = 1;
+
+    private int powerOfBullet = 20;
+
+    private ProgressBar progressBar = new ProgressBar(1);
+    private Label label = new Label();
+
+    private Player player = new Player("Roma", xStartPositionPlayer, yStartPositionPlayer);
+
+    private List<Bullet> bullets = new ArrayList<>();
+
+    private boolean isTouch = false;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
 
         root.setPrefSize(WIDTH,HEIGHT);
 
-        player.setX(WIDTH / 2);
-        player.setY(HEIGHT - 50);
+        label.setText(player.getName());
 
+        progressBar.setTranslateY(20);
+
+        root.getChildren().addAll(label, progressBar);
         root.getChildren().addAll(player);
 
         Scene scene = new Scene(root);
@@ -45,8 +72,9 @@ public class Main extends Application {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                moving(5);
-                randomBullet();
+
+                moving(speedOfPlayer);
+                randomBullet(speedOfBullet, frequencyOfBullets);
             }
         };
 
@@ -70,30 +98,47 @@ public class Main extends Application {
         }
     }
 
-    public void randomBullet() {
-        int random = (int) Math.floor(Math.random() * 50);
-        int x = (int) Math.floor(Math.random() * 1200 + 100);
+    public void randomBullet(int speed, int frequency) {
+        int random = (int) Math.floor(Math.random() * 100);
+        int x = (int) Math.floor(Math.random() * rightBorderOfBullet + leftBorderOfBullet);
 
-        if (random == 5) {
-            Bullet bullet = new Bullet();
-            bullet.setX(x);
-            bullet.setY(20);
+        if (random <= frequency) {
+            Bullet bullet = new Bullet(x, -20);
             root.getChildren().addAll(bullet);
-            moveBullet(bullet);
+            moveBullet(bullet, speed);
         }
     }
 
-    public void moveBullet(Bullet bullet) {
-        timerBullet = new AnimationTimer() {
+    public void moveBullet(Bullet bullet, int speed) {
+
+        AnimationTimer timerBullet = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                bullet.move(2);
-                if (bullet.getY() > HEIGHT) {
-                    root.getChildren().removeAll(bullet);
+                Bullet thisBullet = bullet;
+                thisBullet.move(speed);
+                if (player.getBoundsInParent().intersects(thisBullet.getBoundsInParent())) {
+                    player.minusHP(powerOfBullet);
+                    progressBar.setProgress(player.getHp() * 1.0 / 100);
+
+                    if (player.getHp() <= 0) {
+                        gameOver();
+                    }
+
+                    root.getChildren().removeAll(thisBullet);
+                    this.stop();
+                }
+                if (thisBullet.getY() > HEIGHT) {
+                    root.getChildren().removeAll(thisBullet);
+                    this.stop();
                 }
             }
         };
         timerBullet.start();
+    }
+
+    public void gameOver() {
+        player.setHp(100);
+        progressBar.setProgress(1);
     }
 
     public static void main(String[] args) {

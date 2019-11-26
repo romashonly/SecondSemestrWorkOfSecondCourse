@@ -8,23 +8,29 @@ public class Player extends Pane {
     private String name;
     private int hp;
     private Rectangle body;
-    private int x;
-    private int y;
+    private int xPos;
+    private int yPos;
 
-    public Player(String name) {
+    public Player(String name, int xPos, int yPos) {
         this.name = name;
         this.hp = 100;
         this.body = new Rectangle(20, 20, Color.BLACK);
+        this.xPos = xPos;
+        this.yPos = yPos;
         getChildren().addAll(body);
+        setxPos(getyPos());
+        setyPos(getxPos());
     }
 
-    public void minusHP() {
-        setHp(getHp() - 5);
+    public void minusHP(int power) {
+        setHp(getHp() - power);
     }
 
     public void move(int moveX) {
-        setX(getX() + moveX);
+        setxPos(getxPos() + moveX);
     }
+
+
 
     public String getName() {
         return name;
@@ -38,12 +44,12 @@ public class Player extends Pane {
         return body;
     }
 
-    public int getX() {
-        return x;
+    public int getxPos() {
+        return xPos;
     }
 
-    public int getY() {
-        return y;
+    public int getyPos() {
+        return yPos;
     }
 
     public void setName(String name) {
@@ -58,12 +64,12 @@ public class Player extends Pane {
         this.body = body;
     }
 
-    public void setX(int x) {
-        this.x = x;
-        this.setTranslateX(x);
+    public void setxPos(int xPos) {
+        this.xPos = xPos;
+        this.setTranslateX(xPos);
     }
 
-    public void setY(int y) {
-        this.setTranslateY(y);
+    public void setyPos(int yPos) {
+        this.setTranslateY(yPos);
     }
 }

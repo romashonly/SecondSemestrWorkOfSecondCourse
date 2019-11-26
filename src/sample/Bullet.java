@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -10,8 +11,12 @@ public class Bullet extends Pane {
     private int x;
     private int y;
 
-    public Bullet() {
+    public Bullet(int x, int y) {
         this.body = new Rectangle(20, 20, Color.RED);
+        this.x = x;
+        this.y = y;
+        setX(getX());
+        setY(getY());
         getChildren().addAll(body);
     }
 
