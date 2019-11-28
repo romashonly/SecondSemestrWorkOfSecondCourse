@@ -20,11 +20,8 @@ public class GameController {
 
     private AnimationTimer timer;
 
-    private final int WIDTH = 1300;
-    private final int HEIGHT = 700;
-
-    private int xStartPositionPlayer = WIDTH / 2;
-    private int yStartPositionPlayer = HEIGHT - 50;
+    private int xStartPositionPlayer = Size.WIDTH / 2;
+    private int yStartPositionPlayer = Size.HEIGHT - 50;
 
     private int speedOfPlayer = 5;
     private int speedOfBullet = 7;
@@ -56,8 +53,8 @@ public class GameController {
         playerSecond.setyPos(yStartPositionPlayer);
     }
 
-    public void starGame() {
-        gameRoot.setPrefSize(WIDTH,HEIGHT);
+    public void startGame() {
+        gameRoot.setPrefSize(Size.WIDTH, Size.HEIGHT);
 
         label.setText(playerFirst.getName());
 
@@ -123,7 +120,7 @@ public class GameController {
                     gameRoot.getChildren().removeAll(bullet);
                     this.stop();
                 }
-                if (bullet.getY() > HEIGHT) {
+                if (bullet.getY() > Size.HEIGHT) {
                     gameRoot.getChildren().removeAll(bullet);
                     this.stop();
                 }
