@@ -11,15 +11,11 @@ public class Player extends Pane {
     private int xPos;
     private int yPos;
 
-    public Player(String name, int xPos, int yPos) {
+    public Player(String name, Color color) {
         this.name = name;
         this.hp = 100;
-        this.body = new Rectangle(20, 20, Color.BLACK);
-        this.xPos = xPos;
-        this.yPos = yPos;
+        this.body = new Rectangle(20, 20, color);
         getChildren().addAll(body);
-        setxPos(getyPos());
-        setyPos(getxPos());
     }
 
     public void minusHP(int power) {
