@@ -9,18 +9,21 @@ import java.util.List;
 public class Server {
 
     public static int clients;
+    public static List<Socket> clientsSockets = new ArrayList<>();
+    public static List<Connection> connections = new ArrayList<>();
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         final int PORT = 1234;
         ServerSocket ss = new ServerSocket(PORT);
-        List<Socket> clientsSockets = new ArrayList<>();
 
         while (clientsSockets.size() != 2) {
             Socket s = ss.accept();
             clientsSockets.add(s);
             clients = clientsSockets.size();
             System.out.println("New client connected." + " Clients: " + clients);
-            (new Thread(new Connection(s))).start();
+            Connection connection = new Connection(s, clients);
+            connections.add(connection);
+            (new Thread(connection)).start();
         }
     }
 }

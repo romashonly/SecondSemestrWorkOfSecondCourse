@@ -66,6 +66,7 @@ public class Player extends Pane {
     }
 
     public void setyPos(int yPos) {
+        this.yPos = yPos;
         this.setTranslateY(yPos);
     }
 }
