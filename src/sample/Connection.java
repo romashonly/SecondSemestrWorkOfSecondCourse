@@ -7,12 +7,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Connection implements Runnable {
 
     private Socket socket;
     private int id;
+
+    private Thread listenerOfMoving;
+    private Thread listenerOfGameOver;
 
     public Connection(Socket socket, int id) {
         this.socket = socket;
@@ -23,15 +27,28 @@ public class Connection implements Runnable {
     public void run() {
         try {
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
             while (Server.clients != 2) {
                 dataOutputStream.writeUTF(Integer.toString(Server.clients));
             }
 
             dataOutputStream.writeUTF(Integer.toString(Server.clients));
+            System.out.println(Server.clients);
 
-            startListenerOfMoving();
-            startListenerOfBullets();
+            String name = dataInputStream.readUTF();
+
+            if (Server.connections.get(0).getId() == id) {
+                DataOutputStream dataOutputStreamOfSecondSocket = new DataOutputStream(Server.connections.get(1).getSocket().getOutputStream());
+                dataOutputStreamOfSecondSocket.writeUTF(name);
+            }
+            else  {
+                DataOutputStream dataOutputStreamOfSecondSocket = new DataOutputStream(Server.connections.get(0).getSocket().getOutputStream());
+                dataOutputStreamOfSecondSocket.writeUTF(name);
+            }
+
+            listenerOfMoving = startListenerOfMoving();
+            listenerOfMoving.start();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,8 +56,8 @@ public class Connection implements Runnable {
 
     }
 
-    public void startListenerOfMoving() {
-        new Thread(new Runnable() {
+    public Thread startListenerOfMoving() {
+        return new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -49,6 +66,21 @@ public class Connection implements Runnable {
                     while (true) {
                         int xPos = dataInputStream.readInt();
                         int yPos = dataInputStream.readInt();
+//                        String string = dataInputStream.readUTF();
+//
+//                        if (check) {
+//                            Server.setClients(0);
+//                            Server.setClientsSockets(new ArrayList<>());
+//                            Server.setConnections(new ArrayList<>());
+//                            for (Thread thread :
+//                                    Server.threads) {
+//                                thread.interrupt();
+//                            }
+//                            Server.setThreads(new ArrayList<>());
+//                            listenerOfMoving.interrupt();
+//
+//                            Server.waitingClients();
+//                        }
 
                         if (Server.connections.get(0).getId() == id) {
                             DataOutputStream dataOutputStreamOfSecondSocket = new DataOutputStream(Server.connections.get(1).getSocket().getOutputStream());
@@ -64,15 +96,6 @@ public class Connection implements Runnable {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-        }).start();
-    }
-
-    public void startListenerOfBullets() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
             }
         });
     }

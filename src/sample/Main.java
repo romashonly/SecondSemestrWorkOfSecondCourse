@@ -19,15 +19,15 @@ import java.net.Socket;
 
 public class Main extends Application {
 
-    private Stage stage;
+    private static Stage stage;
 
-    private Pane startRoot = new Pane();
-    private Pane gameRoot = new Pane();
-    private Pane gameOverRoot = new Pane();
+    private static Pane startRoot = new Pane();
+    private static Pane gameRoot = new Pane();
+    private static Pane gameOverRoot = new Pane();
 
-    private Scene startScene = new Scene(startRoot);
-    private Scene gameScene = new Scene(gameRoot);
-    private Scene gameOverScene = new Scene(gameOverRoot);
+    private static Scene startScene = new Scene(startRoot);
+    private static Scene gameScene = new Scene(gameRoot);
+    private static Scene gameOverScene = new Scene(gameOverRoot);
 
 
     @Override
@@ -42,13 +42,12 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public void setStartScene() {
+    public static void setStartScene() {
 
         startRoot.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         startRoot.setPrefSize(Size.WIDTH, Size.HEIGHT);
 
         TextField textField = new TextField();
-        textField.setText("Your name");
 
         Button button = new Button();
         button.setText("START");
@@ -58,7 +57,7 @@ public class Main extends Application {
 
         button.setOnAction(event ->  {
                 try {
-                    setGameScene();
+                    setGameScene(textField.getText());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -68,25 +67,19 @@ public class Main extends Application {
         stage.setScene(startScene);
     }
 
-    public void setGameScene() throws IOException {
+    public static void setGameScene(String nameOfPlayer) throws IOException {
 
-        Client client = new Client();
+        Client client = new Client(nameOfPlayer);
         Socket socket = client.connectWithServer();
         System.out.println(client.getId());
 
-        Player playerFirst = new Player("Roma", Color.BLACK);
+        Player playerFirst = new Player( nameOfPlayer, Color.BLACK);
         Player playerSecond = new Player(client.getNameOFSecondPlayer(), Color.GREEN);
 
         GameController gameController = new GameController(gameRoot, gameScene, playerFirst, playerSecond, socket, client.getId());
         gameController.startGame();
 
         stage.setScene(gameScene);
-    }
-
-    public void setGameOverScene() {
-        gameOverRoot.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
-        gameOverRoot.setPrefSize(Size.WIDTH, Size.HEIGHT);
-        stage.setScene(gameOverScene);
     }
 
     public static void main(String[] args) {

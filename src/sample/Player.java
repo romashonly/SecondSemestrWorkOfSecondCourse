@@ -1,5 +1,7 @@
 package sample;
 
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -10,6 +12,8 @@ public class Player extends Pane {
     private Rectangle body;
     private int xPos;
     private int yPos;
+    private Label labelName;
+    private ProgressBar progressBar;
 
     public Player(String name, Color color) {
         this.name = name;
@@ -20,6 +24,7 @@ public class Player extends Pane {
 
     public void minusHP(int power) {
         setHp(getHp() - power);
+        progressBar.setProgress(getHp() * 1.0 / 100);
     }
 
     public void move(int moveX) {
@@ -68,5 +73,25 @@ public class Player extends Pane {
     public void setyPos(int yPos) {
         this.yPos = yPos;
         this.setTranslateY(yPos);
+    }
+
+    public Label getLabelName() {
+        return labelName;
+    }
+
+    public ProgressBar getProgressBar() {
+        return progressBar;
+    }
+
+    public void setLabelName(Label labelName) {
+        this.labelName = labelName;
+    }
+
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
+    }
+
+    public boolean isAlive() {
+        return getHp() > 0;
     }
 }

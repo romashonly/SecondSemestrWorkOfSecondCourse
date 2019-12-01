@@ -12,6 +12,11 @@ public class Client {
 
     private int id = 0;
     private String nameOFSecondPlayer = "...";
+    private String nameOfPlayer;
+
+    public Client(String nameOfPlayer) {
+        this.nameOfPlayer = nameOfPlayer;
+    }
 
     public Socket connectWithServer() throws IOException {
 
@@ -19,6 +24,7 @@ public class Client {
         final int PORT = 1234;
         Socket socket = new Socket(HOST, PORT);
         DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
         String message = dataInputStream.readUTF();
         this.id = Integer.parseInt(message);
@@ -26,9 +32,15 @@ public class Client {
             message = dataInputStream.readUTF();
         }
 
-//        nameOFSecondPlayer = dataInputStream.readUTF();
+        dataOutputStream.writeUTF(getNameOfPlayer());
+
+        nameOFSecondPlayer = dataInputStream.readUTF();
 
         return socket;
+    }
+
+    public String getNameOfPlayer() {
+        return nameOfPlayer;
     }
 
     public String getNameOFSecondPlayer() {
