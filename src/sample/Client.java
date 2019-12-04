@@ -10,17 +10,19 @@ import java.net.Socket;
 
 public class Client {
 
+    private String host;
     private int id = 0;
     private String nameOFSecondPlayer = "...";
     private String nameOfPlayer;
 
-    public Client(String nameOfPlayer) {
+    public Client(String nameOfPlayer, String host) {
         this.nameOfPlayer = nameOfPlayer;
+        this.host = host;
     }
 
     public Socket connectWithServer() throws IOException {
 
-        final String HOST = "localhost";
+        final String HOST = host;
         final int PORT = 1234;
         Socket socket = new Socket(HOST, PORT);
         DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());

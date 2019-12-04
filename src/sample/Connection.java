@@ -34,7 +34,6 @@ public class Connection implements Runnable {
             }
 
             dataOutputStream.writeUTF(Integer.toString(Server.clients));
-            System.out.println(Server.clients);
 
             String name = dataInputStream.readUTF();
 

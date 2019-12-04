@@ -30,7 +30,7 @@ public class GameController {
     private AnimationTimer timer;
 
     private int xStartPositionPlayer = WIDTH / 2;
-    private int yStartPositionPlayer = HEIGHT - 50;
+    private int yStartPositionPlayer = HEIGHT - 131;
 
     private int speedOfPlayer = 5;
     private int speedOfBullet = 2;
@@ -95,7 +95,10 @@ public class GameController {
         gameRoot.getChildren().addAll(playerSecond);
 
         gameScene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
-        gameScene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
+        gameScene.setOnKeyReleased(event -> {
+            keys.put(event.getCode(), false);
+            playerFirst.animation.stop();
+        });
 
         timer = new AnimationTimer() {
 
@@ -114,6 +117,7 @@ public class GameController {
                     dataOutputStream.writeInt(playerFirst.getyPos());
 
                     DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+                    playerSecond.animation.play();
                     playerSecond.setxPos(dataInputStream.readInt());
                     playerSecond.setyPos(dataInputStream.readInt());
 
@@ -127,7 +131,7 @@ public class GameController {
 //                    createBullet(100);
                         randomForFreq = dataInputStream.readInt();
                         xPosOfBullet = dataInputStream.readInt();
-                        randomBullet(frequencyOfBullets, (int) randomForFreq, xPosOfBullet);
+                        randomBullet(frequencyOfBullets, randomForFreq, xPosOfBullet);
                     }
 
                 } catch (IOException e) {
@@ -144,11 +148,27 @@ public class GameController {
     }
 
     public void moving(int speed) {
+
         if (isPressed(KeyCode.RIGHT)) {
-            playerFirst.move(speed);
+            if (playerFirst.getBoundsInParent().intersects(WIDTH, 0, 1, HEIGHT)) {
+                playerFirst.setxPos(WIDTH - 20);
+            }
+            else {
+                playerFirst.setScaleX(1);
+                playerFirst.animation.play();
+                playerFirst.move(speed);
+            }
         }
         else if (isPressed(KeyCode.LEFT)) {
-            playerFirst.move(speed * -1);
+
+            if (playerFirst.getBoundsInParent().intersects(-1, 0, 1, HEIGHT)) {
+                playerFirst.setxPos(0);
+            }
+            else {
+                playerFirst.setScaleX(-1);
+                playerFirst.animation.play();
+                playerFirst.move(speed * -1);
+            }
         }
 
     }
@@ -183,13 +203,9 @@ public class GameController {
             public void handle(long now) {
                 bullet.move(speed);
 
-
-                try {
                     checkCollisions(bullet, playerFirst, this);
                     checkCollisions(bullet, playerSecond, this);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
 
                 if (bullet.getY() > HEIGHT) {
                     gameRoot.getChildren().removeAll(bullet);
@@ -201,9 +217,8 @@ public class GameController {
         timerBullet.start();
     }
 
-    private void checkCollisions(Bullet bullet, Player player, AnimationTimer timer) throws IOException {
+    private void checkCollisions(Bullet bullet, Player player, AnimationTimer timer) {
         if (player.getBoundsInParent().intersects(bullet.getBoundsInParent())) {
-//  Игра закончится при первом касании препятствия
             player.minusHP(powerOfBullet);
 
             if (!player.isAlive()) {
@@ -215,7 +230,7 @@ public class GameController {
         }
     }
 
-    public void gameOver() throws IOException {
+    public void gameOver() {
         timer.stop();
         gameRoot.getChildren().removeAll(labelOfFirstPlayer, progressBarOfFirstPlayer, labelOfSecondPlayer, progressBarOfSecondPlayer);
 
@@ -226,22 +241,20 @@ public class GameController {
         Button goOut = new Button();
         goOut.setText("Выйти");
         goOut.setTranslateX(WIDTH / 2 - 10);
-        goOut.setTranslateY(HEIGHT / 2 + 10);
+        goOut.setTranslateY(HEIGHT / 2 + 20);
 
         goOut.setOnAction(event ->  {
-            Main.setStartScene();
+            Main.stage.close();
         });
 
         if (playerFirst.isAlive()) {
-            resultLabel.setText("Winner !!!");
+            resultLabel.setText("Win !!!");
         }
         else {
-            resultLabel.setText("Loser :(");
+            resultLabel.setText("Lose :(");
         }
 
         gameRoot.getChildren().addAll(resultLabel, goOut);
 
-//        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-//        dataOutputStream.writeUTF("over");
     }
 }

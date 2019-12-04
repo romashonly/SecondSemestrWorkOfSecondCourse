@@ -1,18 +1,24 @@
 package sample;
 
 import javafx.animation.AnimationTimer;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 public class Bullet extends Pane {
 
-    private Rectangle body;
+//    private Rectangle body;
+    private ImageView body;
     private int x;
     private int y;
 
     public Bullet(int x, int y) {
-        this.body = new Rectangle(20, 20, Color.RED);
+        this.body = new ImageView(new Image("sample/img/a.png"));
+        body.setFitHeight(30);
+        body.setFitWidth(30);
         this.x = x;
         this.y = y;
         setX(getX());
@@ -24,7 +30,7 @@ public class Bullet extends Pane {
         setY(getY() + moveY);
     }
 
-    public Rectangle getBody() {
+    public ImageView getBody() {
         return body;
     }
 
