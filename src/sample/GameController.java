@@ -5,14 +5,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static sample.Size.HEIGHT;
@@ -27,16 +30,14 @@ public class GameController {
     private Pane gameRoot;
     private Scene gameScene;
 
-    private AnimationTimer timer;
+    private AnimationTimer playerTimer;
+    private List<AnimationTimer> bulletTimers = new ArrayList<>();
 
     private int xStartPositionPlayer = WIDTH / 2;
     private int yStartPositionPlayer = HEIGHT - 131;
 
     private int speedOfPlayer = 5;
     private int speedOfBullet = 2;
-
-    private int leftBorderOfPlayer = 1300;
-    private int rightBorderOfPlayer = 0;
 
     private int leftBorderOfBullet = 0;
     private int rightBorderOfBullet = 1300;
@@ -53,6 +54,9 @@ public class GameController {
 
     private Player playerFirst;
     private Player playerSecond;
+
+    private Label resultLabel;
+    private Button newGame;
 
     public GameController(Pane gameRoot, Scene gameScene, Player playerFirst, Player playerSecond, Socket socket, int id) {
 
@@ -100,7 +104,7 @@ public class GameController {
             playerFirst.animation.stop();
         });
 
-        timer = new AnimationTimer() {
+        playerTimer = new AnimationTimer() {
 
             @Override
             public void handle(long now) {
@@ -140,7 +144,7 @@ public class GameController {
             }
         };
 
-        timer.start();
+        playerTimer.start();
     }
 
     public boolean isPressed(KeyCode keyCode) {
@@ -154,7 +158,7 @@ public class GameController {
                 playerFirst.setxPos(WIDTH - 20);
             }
             else {
-                playerFirst.setScaleX(1);
+                playerFirst.setScaleX(-1);
                 playerFirst.animation.play();
                 playerFirst.move(speed);
             }
@@ -165,7 +169,7 @@ public class GameController {
                 playerFirst.setxPos(0);
             }
             else {
-                playerFirst.setScaleX(-1);
+                playerFirst.setScaleX(1);
                 playerFirst.animation.play();
                 playerFirst.move(speed * -1);
             }
@@ -206,7 +210,6 @@ public class GameController {
                     checkCollisions(bullet, playerFirst, this);
                     checkCollisions(bullet, playerSecond, this);
 
-
                 if (bullet.getY() > HEIGHT) {
                     gameRoot.getChildren().removeAll(bullet);
                     this.stop();
@@ -231,20 +234,41 @@ public class GameController {
     }
 
     public void gameOver() {
-        timer.stop();
-        gameRoot.getChildren().removeAll(labelOfFirstPlayer, progressBarOfFirstPlayer, labelOfSecondPlayer, progressBarOfSecondPlayer);
 
-        Label resultLabel = new Label();
+        for (AnimationTimer timer :
+                bulletTimers) {
+            timer.stop();
+        }
+
+
+        playerTimer.stop();
+
+        gameRoot.getChildren().removeAll(labelOfFirstPlayer, progressBarOfFirstPlayer, labelOfSecondPlayer, progressBarOfSecondPlayer, playerFirst, playerSecond);
+
+        resultLabel = new Label();
         resultLabel.setTranslateX(WIDTH / 2 - 10);
         resultLabel.setTranslateY(HEIGHT / 2);
 
-        Button goOut = new Button();
-        goOut.setText("Выйти");
-        goOut.setTranslateX(WIDTH / 2 - 10);
-        goOut.setTranslateY(HEIGHT / 2 + 20);
+        newGame = new Button();
+        newGame.setText("Заново");
+        newGame.setTranslateX(WIDTH / 2 - 10);
+        newGame.setTranslateY(HEIGHT / 2 + 20);
 
-        goOut.setOnAction(event ->  {
-            Main.stage.close();
+        newGame.setOnAction(event ->  {
+
+            Player playerF = new Player(playerFirst.getName());
+            Player playerS = new Player(playerSecond.getName());
+
+            GameController gameController = new GameController(gameRoot, gameScene, playerF, playerS, socket, idOfClient);
+            gameController.startGame();
+
+            gameRoot.getChildren().removeAll(resultLabel, newGame);
+
+            Image image = new Image("sample/img/background.png");
+
+            gameRoot.setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT)));
+
+            Main.stage.setScene(gameScene);
         });
 
         if (playerFirst.isAlive()) {
@@ -254,7 +278,7 @@ public class GameController {
             resultLabel.setText("Lose :(");
         }
 
-        gameRoot.getChildren().addAll(resultLabel, goOut);
+        gameRoot.getChildren().addAll(resultLabel, newGame);
 
     }
 }

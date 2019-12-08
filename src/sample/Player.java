@@ -19,12 +19,12 @@ public class Player extends Pane {
     private ProgressBar progressBar;
 
     private Image squirrelImage = new Image("sample/img/squirrel.png");
-    private int count = 3;
-    private int columns = 3;
-    private int offsetX = 96;
-    private int offsetY = 33;
-    private int width = 16;
-    private int height = 16;
+    private int count = 5;
+    private int columns = 5;
+    private int offsetX = 85;
+    private int offsetY = 90;
+    private int width = 80;
+    private int height = 80;
 
     public SpriteAnimation animation;
 
@@ -40,7 +40,7 @@ public class Player extends Pane {
         body.setFitHeight(40);
         body.setFitWidth(40);
         body.setViewport(new Rectangle2D( offsetX, offsetY, width, height));
-        animation = new SpriteAnimation(this.body, Duration.millis(200), count, columns, offsetX, offsetY, width, height);
+        animation = new SpriteAnimation(this.body, Duration.millis(500), count, columns, offsetX, offsetY, width, height);
         getChildren().addAll(body, labelName);
     }
 

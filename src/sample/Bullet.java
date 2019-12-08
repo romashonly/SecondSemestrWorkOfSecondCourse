@@ -17,8 +17,8 @@ public class Bullet extends Pane {
 
     public Bullet(int x, int y) {
         this.body = new ImageView(new Image("sample/img/a.png"));
-        body.setFitHeight(30);
-        body.setFitWidth(30);
+        body.setFitHeight(22);
+        body.setFitWidth(22);
         this.x = x;
         this.y = y;
         setX(getX());

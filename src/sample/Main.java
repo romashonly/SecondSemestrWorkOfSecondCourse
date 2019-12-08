@@ -27,7 +27,6 @@ public class Main extends Application {
 
     private static Scene startScene = new Scene(startRoot);
     private static Scene gameScene = new Scene(gameRoot);
-    private static Scene gameOverScene = new Scene(gameOverRoot);
 
 
     @Override
